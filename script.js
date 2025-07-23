@@ -221,6 +221,29 @@ justify-content: space-around;
 margin: 1.4rem 0;
 gap: 1rem;
 }
+
+
+.ins-user-detail-active {
+  color: var(--green-100);
+}
+.ins-user-detail-content {
+  text-align: center;
+  color: var(--green-100);
+  font-weight: bold;
+  padding-bottom: 1rem;
+}
+
+.ins-user-company,
+.ins-user-website {
+  display: none;
+}
+
+
+
+
+
+
+
 @media screen and (min-width: 768px) {
   .ins-user-container {
     grid-template-columns: repeat(2, 1fr);
@@ -319,12 +342,19 @@ gap: 1rem;
                           <i class="fa-solid fa-building"></i>
                           <i class="fa-solid fa-globe"></i>
                        </div>
-          
+                       <div class="ins-user-detail-content">
+                             <p class="ins-user-address">${user.address.city} / ${user.address.street}</p>
+                             <p class="ins-user-company"><span>${
+                               user.company.name
+                             } </span><br><span>${user.company.catchPhrase}</span></p>
+                             <p class="ins-user-website">${user.website}</p>
+                       </div>
                   </div>`;
       });
       $insUserContainer.append(html);
       $insApiUsers.append($insUserContainer);
     }
+    $(".fa-location-dot").addClass("ins-user-detail-active");
 
     $(document).on("click", ".delete-user", function () {
       let users = JSON.parse(localStorage.getItem("users") || []);
