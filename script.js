@@ -303,6 +303,24 @@ gap: 1rem;
 .fa-check{
     padding-right: 0.4rem;
 }
+.ins-error-content {
+  margin: 4rem auto;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.ins-error-message{
+    font-size: 4rem;
+    color: var(--red-300);
+    font-weight: 600;
+}
+
+.ins-error-image {
+  height: 24rem;
+}
 
 @media screen and (min-width: 768px) {
   .ins-user-container {
@@ -336,7 +354,9 @@ gap: 1rem;
     const nowDate = new Date().getTime();
     console.log("date", new Date(expiresDate));
     console.log("expires", expiresDate);
-
+    $("<h1>User List - Fetch API</h1>")
+      .addClass("ins-page-title")
+      .insertBefore($insApiUsers);
     getData();
 
     function getData() {
@@ -479,6 +499,7 @@ gap: 1rem;
     }
 
     function successMessageToastify(message) {
+      $(".message").remove();
       const div = $("<div></div>");
       const icons = $("<i></i>").addClass("fa-solid fa-check");
       div
@@ -497,10 +518,10 @@ gap: 1rem;
     }
 
     function errorMessage(message) {
-      const div = $("<div></div>").addClass("error-content");
-      const p = $("<p></p>").text(message).addClass("error-message");
+      const div = $("<div></div>").addClass("ins-error-content");
+      const p = $("<p></p>").text(message).addClass("ins-error-message");
       const img = $("<img/>")
-        .addClass("error-image")
+        .addClass("ins-error-image")
         .attr(
           "src",
           "https://media.istockphoto.com/id/1095047472/vector/error-page-dead-emoji-illustration.jpg?s=612x612&w=0&k=20&c=mEAErA572V--tYXvGYaNcclA17boFY8S8UwIgOgCZek="
@@ -509,8 +530,9 @@ gap: 1rem;
 
       div.append(p);
       p.before(img);
+      $(".ins-page-title").remove();
       $insApiUsers.remove();
-      $("body").append(div);
+      $("body").append(div).css("backgroundColor", "white");
     }
   } catch (err) {
     console.log("err", err);
