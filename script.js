@@ -378,6 +378,7 @@ gap: 1rem;
         }
       } catch (error) {
         console.log("error");
+        errorMessage(error);
       }
     }
 
@@ -493,6 +494,23 @@ gap: 1rem;
           $(this).remove();
         });
       }, 5000);
+    }
+
+    function errorMessage(message) {
+      const div = $("<div></div>").addClass("error-content");
+      const p = $("<p></p>").text(message).addClass("error-message");
+      const img = $("<img/>")
+        .addClass("error-image")
+        .attr(
+          "src",
+          "https://media.istockphoto.com/id/1095047472/vector/error-page-dead-emoji-illustration.jpg?s=612x612&w=0&k=20&c=mEAErA572V--tYXvGYaNcclA17boFY8S8UwIgOgCZek="
+        )
+        .attr("alt", "error-image");
+
+      div.append(p);
+      p.before(img);
+      $insApiUsers.remove();
+      $("body").append(div);
     }
   } catch (err) {
     console.log("err", err);
