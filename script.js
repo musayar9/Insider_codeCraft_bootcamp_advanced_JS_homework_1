@@ -321,7 +321,57 @@ gap: 1rem;
 .ins-error-image {
   height: 24rem;
 }
+.ins-not-user {
+  background-color: var(--white);
+  width: var(--view-width);
+  max-width: 500px;
+  border-radius: var(--borderRadius-50);
+  box-shadow: var(--shadow-1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.675rem 1rem;
+}
 
+.fa-circle-exclamation {
+  font-size: 5rem;
+  color: var(--red-100);
+}
+
+.ins-not-user-message {
+  font-size: 1.2rem;
+  color: var(--grey-500);
+  font-weight: 500;
+}
+
+.ins-not-user-button {
+  background-color: var(--primary-25);
+  border: 1px solid var(--primary-100);
+  padding: 0.675rem 1rem;
+  border-radius: var(--borderRadius-50);
+  width: 50%;
+  font-size: 1rem;
+  color: var(--primary-200);
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+}
+
+.fa-arrow-rotate-left{
+  padding-right: 0.5rem;
+
+  
+}
+
+
+.ins-not-user-button:hover{
+transform: translateY(-4px);
+  background-color: var(--primary-50);
+  color: var(--white);
+  box-shadow: var(--shadow-2);
+}
 @media screen and (min-width: 768px) {
   .ins-user-container {
     grid-template-columns: repeat(2, 1fr);
@@ -362,7 +412,7 @@ gap: 1rem;
     function getData() {
       let users = JSON.parse(localStorage.getItem("users"));
 
-      if (users) {
+      if (users?.data.length > 0) {
         if (nowDate < users.expiresDate) {
           console.log("users bylundu", users.data);
           addUserToList(users?.data);
@@ -412,7 +462,7 @@ gap: 1rem;
                          user?.name
                        )}</p>
                        <div class="ins-card-info">
-                            <p class="ins-user-name">${user.name}</p>
+                            <p class="ins-user-name">${user?.name}</p>
                             <p class="ins-user-email"><i class="fa-solid fa-envelope"></i> <span>${
                               user.email
                             }</span></p>
@@ -425,7 +475,7 @@ gap: 1rem;
                             }><i class="fa-solid fa-trash"></i></button>
                     </div>
                      <div class="ins-user-detail">
-                          <i class="fa-solid fa-location-dot"></i>
+                          <i class="fa-solid fa-location-dot ins-user-detail-active"></i>
                           <i class="fa-solid fa-building"></i>
                           <i class="fa-solid fa-globe"></i>
                        </div>
@@ -445,7 +495,7 @@ gap: 1rem;
       $insUserContainer.append(html);
       $insApiUsers.append($insUserContainer);
     }
-    $(".fa-location-dot").addClass("ins-user-detail-active");
+    // $(".fa-location-dot").addClass("ins-user-detail-active");
 
     $(document).on("mouseover", ".ins-user-detail i", function () {
       console.log("dw");
@@ -471,7 +521,7 @@ gap: 1rem;
     });
 
     $(document).on("click", ".ins-delete-user", function () {
-      let users = JSON.parse(localStorage.getItem("users"));
+      let users = JSON.parse(localStorage.getItem("users") || []);
       const userId = $(this).data("id");
       const findUser = users?.data.find((user) => user?.id === userId);
       const updateUser = users?.data.filter((user) => user?.id !== userId);
@@ -488,8 +538,33 @@ gap: 1rem;
           console.log("users silindi");
         });
 
-      successMessageToastify(`${findUser.name} adlı kullanıcı liteden silindi`);
+      successMessageToastify(`${findUser?.name} adlı kullanıcı liteden silindi`);
+      deletedAllUser(updateUser);
     });
+
+    function deletedAllUser(updateUser) {
+      if (updateUser?.length === 0) {
+        const div = $("<div></div>").addClass("ins-not-user");
+        const i = $("<i></i>").addClass("fa-solid fa-circle-exclamation");
+        const p = $("<p></p>")
+          .text("Tüm Kuallnıcılar listeden silindi")
+          .addClass("ins-not-user-message");
+        const button = $("<button></button>")
+          .addClass("ins-not-user-button")
+          .append($("<i class='fa-solid fa-arrow-rotate-left'></i>"))
+          .append($("<span>Yenile</span>"));
+
+        div.append(i, p, button).slideUp(200).slideDown(200);
+        $("body").append(div);
+
+        button.click(function () {
+          console.log("clicked button");
+          div.remove();
+
+          fetchUsers();
+        });
+      }
+    }
 
     function getUserName(username) {
       const value =
