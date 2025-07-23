@@ -1,5 +1,4 @@
 (async function () {
-
   function loadScript(src) {
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -28,12 +27,10 @@
             <div class="ins-api-users"></div>
 
       `);
-      
-      
-      
-      
-       let users = JSON.parse(localStorage.getItem("users"));
+
+    //  let users = JSON.parse(localStorage.getItem("users"));
     // const expiresDate = new Date().getTime() + 1000 * 60 * 60 * 24;
+    const $insApiUsers = $(".ins-api-users");
     const expiresDate = new Date().setHours(new Date().getHours() + 24);
     const nowDate = new Date().getTime();
     console.log("date", new Date(expiresDate));
@@ -42,9 +39,12 @@
     getData();
 
     function getData() {
+      let users = JSON.parse(localStorage.getItem("users") || []);
+
       if (users) {
         if (nowDate < users.expiresDate) {
           console.log("users bylundu", users.data);
+          addUserToList(users?.data);
         } else {
           console.log("suresi dolmuş userların");
           fetchUsers();
@@ -72,19 +72,24 @@
               expiresDate,
             })
           );
+
+          addUserToList(data);
         }
       } catch (error) {
         console.log("error");
       }
     }
-      
-      
-      
-      
-      
-      
-      
-      
+
+    function addUserToList(data) {
+      let html = "";
+      data.forEach(function (user) {
+        html += ` <div class="user-card" data-id=${user.id}>
+                    <p> ${user.name}</p>
+                    <button class="delete-user" data-id=${user.id}>Sil</button>
+                  </div>`;
+      });
+      $insApiUsers.append(html);
+    }
   } catch (err) {
     console.log("err", err);
   }
