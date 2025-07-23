@@ -74,7 +74,7 @@ html {
   --letterSpacing: 1px;
   --transition: 0.3s ease-in-out all;
   --max-width: 1120px;
-  --fixed-width: 1120px;
+  --fixed-width: 1200px;
   --view-width: 90vw;
 
   /* Shadows */
@@ -147,7 +147,80 @@ ul {
   border-radius: var(--borderRadius-50);
   box-shadow: var(--shadow-2);
 }
+.ins-user-card {
+  background-color: white;
+  border-radius: var(--borderRadius-50);
+  box-shadow: var(--shadow-2);
+  padding: 0.675rem 1rem;
+   transition: var(--transition);
+   cursor: pointer;
+}
+.ins-user-card:hover {
+  transform: translateY(-4px);
+  border: 1px solid var(--green-100);
+  background-color: var(--green-200);
+}
 
+.ins-user-card:hover .ins-name-initials{
+transform: scale(1.05);
+border-color: var(--white);
+color: var(--green-100);
+
+}
+
+.ins-card-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+ 
+}
+
+.ins-name-initials {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 100%;
+  border: 1px solid var(--grey-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-1);
+  color: var(--grey-600);
+  font-weight: bold;
+}
+
+
+.ins-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ins-user-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--grey-600);
+}
+
+.ins-user-email,
+.ins-user-phone {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--grey-500);
+}
+
+.fa-phone,
+.fa-envelope {
+  color: var(--green-100);
+  padding-right: 0.3rem;
+}
+
+.ins-user-detail{
+display: flex;
+align-items: center;
+justify-content: space-around;
+margin: 1.4rem 0;
+gap: 1rem;
+}
 @media screen and (min-width: 768px) {
   .ins-user-container {
     grid-template-columns: repeat(2, 1fr);
@@ -229,9 +302,24 @@ ul {
       let $insUserContainer = $("<div class='ins-user-container'></div>");
       let html = "";
       data.forEach(function (user) {
-        html += ` <div class="user-card" data-id=${user.id}>
-                    <p> ${user.name}</p>
-                    <button class="delete-user" data-id=${user.id}>Sil</button>
+        html += `<div class="ins-user-card" data-id=${user.id}>
+                    <div class="ins-card-content">
+                       <p class="ins-name-initials">${getUserName(user?.name)}</p>
+                       <div class="ins-card-info">
+                            <p class="ins-user-name">${user.name}</p>
+                            <p class="ins-user-email"><i class="fa-solid fa-envelope"></i> <span>${
+                              user.email }</span></p>
+                            <p class="ins-user-phone"><i class="fa-solid fa-phone"></i><span>${
+                              user.phone }</span></p>
+                       </div>
+                         <button class="delete-user" data-id=${user.id}>Sil</button>
+                    </div>
+                     <div class="ins-user-detail">
+                          <i class="fa-solid fa-location-dot"></i>
+                          <i class="fa-solid fa-building"></i>
+                          <i class="fa-solid fa-globe"></i>
+                       </div>
+          
                   </div>`;
       });
       $insUserContainer.append(html);
@@ -250,12 +338,20 @@ ul {
       );
 
       $(this)
-        .closest(".user-card")
+        .closest(".ins-user-card")
         .fadeOut(200, function () {
           $(this).remove();
           console.log("users silindi");
         });
     });
+    
+    
+     function getUserName(username) {
+      const value =
+        username.split(" ")[0].charAt().toUpperCase() +
+        username.split(" ")[1].charAt().toUpperCase();
+      return value;
+    }
   } catch (err) {
     console.log("err", err);
   }
