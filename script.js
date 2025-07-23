@@ -1,4 +1,14 @@
 (async function () {
+  function loadCSS(href) {
+    return new Promise((resolve, reject) => {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = href;
+      link.onload = resolve;
+      link.onerror = reject;
+      document.head.appendChild(link);
+    });
+  }
   function loadScript(src) {
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -13,8 +23,12 @@
     if (typeof jQuery === "undefined") {
       await loadScript("https://code.jquery.com/jquery-3.7.1.min.js");
     }
-    await loadScript(
-      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"
+    // await loadScript(
+    //   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"
+    // );
+
+    await loadCSS(
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     );
 
     $("head").append(`
@@ -142,11 +156,7 @@ ul {
   gap: 1rem;
 }
 
-.ins-user-card {
-  background-color: white;
-  border-radius: var(--borderRadius-50);
-  box-shadow: var(--shadow-2);
-}
+
 .ins-user-card {
   background-color: white;
   border-radius: var(--borderRadius-50);
@@ -154,6 +164,7 @@ ul {
   padding: 0.675rem 1rem;
    transition: var(--transition);
    cursor: pointer;
+     position: relative;
 }
 .ins-user-card:hover {
   transform: translateY(-4px);
@@ -165,6 +176,7 @@ ul {
 transform: scale(1.05);
 border-color: var(--white);
 color: var(--green-100);
+box-shadow: var(--shadow-3);
 
 }
 
@@ -172,6 +184,7 @@ color: var(--green-100);
   display: flex;
   align-items: center;
   gap: 1rem;
+   padding: 0.8rem;
  
 }
 
@@ -196,7 +209,7 @@ color: var(--green-100);
 }
 
 .ins-user-name {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--grey-600);
 }
@@ -240,7 +253,34 @@ gap: 1rem;
 
 
 
+.ins-delete-user {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid var(--grey-300);
+  transition: var(--transition);
+  cursor: pointer;
+}
 
+.ins-user-card:hover .ins-delete-user {
+  background-color: #ffe4e6;
+  transform: scale(1.05);
+  border-color: var(--white);
+  box-shadow: var(--shadow-2);
+}
+
+.ins-delete-user:hover .fa-trash {
+  transform: translateY(-4px);
+}
+
+.ins-delete-user .fa-trash {
+  color: var(--red-100);
+  transition: var(--transition);
+}
 
 
 
@@ -280,7 +320,7 @@ gap: 1rem;
     getData();
 
     function getData() {
-      let users = JSON.parse(localStorage.getItem("users") || []);
+      let users = JSON.parse(localStorage.getItem("users"));
 
       if (users) {
         if (nowDate < users.expiresDate) {
@@ -327,15 +367,21 @@ gap: 1rem;
       data.forEach(function (user) {
         html += `<div class="ins-user-card" data-id=${user.id}>
                     <div class="ins-card-content">
-                       <p class="ins-name-initials">${getUserName(user?.name)}</p>
+                       <p class="ins-name-initials">${getUserName(
+                         user?.name
+                       )}</p>
                        <div class="ins-card-info">
                             <p class="ins-user-name">${user.name}</p>
                             <p class="ins-user-email"><i class="fa-solid fa-envelope"></i> <span>${
-                              user.email }</span></p>
+                              user.email
+                            }</span></p>
                             <p class="ins-user-phone"><i class="fa-solid fa-phone"></i><span>${
-                              user.phone }</span></p>
+                              user.phone
+                            }</span></p>
                        </div>
-                         <button class="delete-user" data-id=${user.id}>Sil</button>
+                            <button class="ins-delete-user" data-id=${
+                              user.id
+                            }><i class="fa-solid fa-trash"></i></button>
                     </div>
                      <div class="ins-user-detail">
                           <i class="fa-solid fa-location-dot"></i>
@@ -343,10 +389,14 @@ gap: 1rem;
                           <i class="fa-solid fa-globe"></i>
                        </div>
                        <div class="ins-user-detail-content">
-                             <p class="ins-user-address">${user.address.city} / ${user.address.street}</p>
+                             <p class="ins-user-address">${
+                               user.address.city
+                             } / ${user.address.street}</p>
                              <p class="ins-user-company"><span>${
                                user.company.name
-                             } </span><br><span>${user.company.catchPhrase}</span></p>
+                             } </span><br><span>${
+          user.company.catchPhrase
+        }</span></p>
                              <p class="ins-user-website">${user.website}</p>
                        </div>
                   </div>`;
@@ -356,8 +406,31 @@ gap: 1rem;
     }
     $(".fa-location-dot").addClass("ins-user-detail-active");
 
-    $(document).on("click", ".delete-user", function () {
-      let users = JSON.parse(localStorage.getItem("users") || []);
+    $(document).on("mouseover", ".ins-user-detail i", function () {
+      console.log("dw");
+      const $icon = $(this);
+      const $cardItem = $icon.closest(".ins-user-card");
+      const detailContent = $cardItem.find(".ins-user-detail-content");
+      detailContent.find("p").slideUp();
+
+      console.log("textr");
+
+      if ($icon.hasClass("fa-location-dot")) {
+        $cardItem.find(".ins-user-address").stop(true, true).slideDown();
+      } else if ($icon.hasClass("fa-building")) {
+        $cardItem.find(".ins-user-company").stop(true, true).slideDown();
+      } else if ($icon.hasClass("fa-globe")) {
+        $cardItem.find(".ins-user-website").stop(true, true).slideDown();
+      }
+
+      $cardItem
+        .find(".ins-user-detail i")
+        .removeClass("ins-user-detail-active");
+      $icon.addClass("ins-user-detail-active");
+    });
+
+    $(document).on("click", ".ins-delete-user", function () {
+      let users = JSON.parse(localStorage.getItem("users"));
       const userId = $(this).data("id");
 
       const updateUser = users?.data.filter((user) => user?.id !== userId);
@@ -374,9 +447,8 @@ gap: 1rem;
           console.log("users silindi");
         });
     });
-    
-    
-     function getUserName(username) {
+
+    function getUserName(username) {
       const value =
         username.split(" ")[0].charAt().toUpperCase() +
         username.split(" ")[1].charAt().toUpperCase();
