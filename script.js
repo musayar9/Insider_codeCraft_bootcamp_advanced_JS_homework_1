@@ -282,7 +282,27 @@ gap: 1rem;
   transition: var(--transition);
 }
 
+.message {
+  position: absolute;
+  top: 5rem;
+  right: 2rem;
+  padding: 0.625rem 2rem;
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: var(--borderRadius-50);
+  box-shadow: var(--shadow-2);
+  z-index: 1;
+}
 
+.success-message {
+  background-color: #e0e7ff;
+  color: var(--primary-200);
+  border: 2px solid var(--primary-100);
+}
+
+.fa-check{
+    padding-right: 0.4rem;
+}
 
 @media screen and (min-width: 768px) {
   .ins-user-container {
@@ -432,7 +452,7 @@ gap: 1rem;
     $(document).on("click", ".ins-delete-user", function () {
       let users = JSON.parse(localStorage.getItem("users"));
       const userId = $(this).data("id");
-
+      const findUser = users?.data.find((user) => user?.id === userId);
       const updateUser = users?.data.filter((user) => user?.id !== userId);
       console.log("updateUser", updateUser);
       localStorage.setItem(
@@ -446,6 +466,8 @@ gap: 1rem;
           $(this).remove();
           console.log("users silindi");
         });
+
+      successMessageToastify(`${findUser.name} adlı kullanıcı liteden silindi`);
     });
 
     function getUserName(username) {
@@ -453,6 +475,24 @@ gap: 1rem;
         username.split(" ")[0].charAt().toUpperCase() +
         username.split(" ")[1].charAt().toUpperCase();
       return value;
+    }
+
+    function successMessageToastify(message) {
+      const div = $("<div></div>");
+      const icons = $("<i></i>").addClass("fa-solid fa-check");
+      div
+        .addClass("message success-message")
+        .hide()
+        .text(message)
+        .prependTo($insApiUsers)
+        .fadeIn(500);
+
+      icons.prependTo(".success-message");
+      setTimeout(function () {
+        $(".success-message").fadeOut(500, function () {
+          $(this).remove();
+        });
+      }, 5000);
     }
   } catch (err) {
     console.log("err", err);
