@@ -379,6 +379,32 @@ transform: translateY(-4px);
  
 }
 
+/* Loading Spinner */
+.loading-spinner {
+  display: none;
+  color: var(--green-100);
+  font-size: 1rem;
+  margin: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner-animation {
+  border: 5px solid var(--grey-100);
+  border-top: 5px solid var(--green-100);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1rem 0;
+}
+
 @media screen and (min-width: 992px) {
   .container h1 {
     font-size: 3rem;
@@ -397,37 +423,38 @@ transform: translateY(-4px);
 
       `);
 
-    //  let users = JSON.parse(localStorage.getItem("users"));
-    // const expiresDate = new Date().getTime() + 1000 * 60 * 60 * 24;
     const $insApiUsers = $(".ins-api-users");
     const expiresDate = new Date().setHours(new Date().getHours() + 24);
     const nowDate = new Date().getTime();
-    console.log("date", new Date(expiresDate));
-    console.log("expires", expiresDate);
+    let isLoading = false;
+
+    // Page Title Created
     $("<h1>User List - Fetch API</h1>")
       .addClass("ins-page-title")
       .insertBefore($insApiUsers);
+
     getData();
 
+    // "We are checking and fetching data from LocalStorage on page load."
     function getData() {
       let users = JSON.parse(localStorage.getItem("users"));
 
       if (users?.data.length > 0) {
         if (nowDate < users.expiresDate) {
-          console.log("users bylundu", users.data);
           addUserToList(users?.data);
         } else {
-          console.log("suresi dolmuş userların");
           fetchUsers();
         }
       } else {
-        console.log("users bulunamadı");
         fetchUsers();
       }
     }
 
+    // Fetching users from API, saving to localStorage and list
     async function fetchUsers() {
       try {
+        isLoading = true;
+        loading();
         const res = await fetch("https://jsonplaceholder.typicode.com/users");
         const data = await res.json();
         if (res.status === 404) {
@@ -435,7 +462,6 @@ transform: translateY(-4px);
         } else if (res.status === 500) {
           throw new Error("500 Internal Server Error");
         } else {
-          console.log("data", data);
           localStorage.setItem(
             "users",
             JSON.stringify({
@@ -447,11 +473,26 @@ transform: translateY(-4px);
           addUserToList(data);
         }
       } catch (error) {
-        console.log("error");
         errorMessage(error);
+      } finally {
+        isLoading = false;
+        loading();
       }
     }
 
+    function loading() {
+      if (isLoading) {
+        let loadingSpin = ` <div class="loading-spinner" id="loading">
+          <div class="spinner-animation"></div>
+          <p>Loading...</p>
+      </div>`;
+        $("body").append(loadingSpin);
+      } else {
+        $("#loading").remove();
+      }
+    }
+
+    //Adding data fetched from the API to the UI
     function addUserToList(data) {
       let $insUserContainer = $("<div class='ins-user-container'></div>");
       let html = "";
@@ -495,16 +536,13 @@ transform: translateY(-4px);
       $insUserContainer.append(html);
       $insApiUsers.append($insUserContainer);
     }
-    // $(".fa-location-dot").addClass("ins-user-detail-active");
 
+    // Displaying information based on icons
     $(document).on("mouseover", ".ins-user-detail i", function () {
-      console.log("dw");
       const $icon = $(this);
       const $cardItem = $icon.closest(".ins-user-card");
       const detailContent = $cardItem.find(".ins-user-detail-content");
       detailContent.find("p").slideUp();
-
-      console.log("textr");
 
       if ($icon.hasClass("fa-location-dot")) {
         $cardItem.find(".ins-user-address").stop(true, true).slideDown();
@@ -520,12 +558,12 @@ transform: translateY(-4px);
       $icon.addClass("ins-user-detail-active");
     });
 
+    // Deleting a user from the list
     $(document).on("click", ".ins-delete-user", function () {
       let users = JSON.parse(localStorage.getItem("users") || []);
       const userId = $(this).data("id");
       const findUser = users?.data.find((user) => user?.id === userId);
       const updateUser = users?.data.filter((user) => user?.id !== userId);
-      console.log("updateUser", updateUser);
       localStorage.setItem(
         "users",
         JSON.stringify({ data: updateUser, expiresDate: users?.expiresDate })
@@ -535,44 +573,44 @@ transform: translateY(-4px);
         .closest(".ins-user-card")
         .fadeOut(200, function () {
           $(this).remove();
-          console.log("users silindi");
         });
 
-      successMessageToastify(`${findUser?.name} adlı kullanıcı liteden silindi`);
+      successMessageToastify(
+        `${findUser?.name} was removed from the user list.`
+      );
       deletedAllUser(updateUser);
     });
 
+    // Notification message displayed on the screen when all users are deleted
     function deletedAllUser(updateUser) {
       if (updateUser?.length === 0) {
         const div = $("<div></div>").addClass("ins-not-user");
         const i = $("<i></i>").addClass("fa-solid fa-circle-exclamation");
         const p = $("<p></p>")
-          .text("Tüm Kuallnıcılar listeden silindi")
+          .text("All users were removed from the list")
           .addClass("ins-not-user-message");
         const button = $("<button></button>")
           .addClass("ins-not-user-button")
           .append($("<i class='fa-solid fa-arrow-rotate-left'></i>"))
-          .append($("<span>Yenile</span>"));
+          .append($("<span>Refresh</span>"));
 
         div.append(i, p, button).slideUp(200).slideDown(200);
         $("body").append(div);
 
         button.click(function () {
-          console.log("clicked button");
           div.remove();
-
           fetchUsers();
         });
       }
     }
-
+    // Create icon according to user's  first name, and last name
     function getUserName(username) {
       const value =
         username.split(" ")[0].charAt().toUpperCase() +
         username.split(" ")[1].charAt().toUpperCase();
       return value;
     }
-
+    // Success Messagge Toastify
     function successMessageToastify(message) {
       $(".message").remove();
       const div = $("<div></div>");
@@ -591,7 +629,7 @@ transform: translateY(-4px);
         });
       }, 5000);
     }
-
+    // Error message displayed on the screen in case of an error
     function errorMessage(message) {
       const div = $("<div></div>").addClass("ins-error-content");
       const p = $("<p></p>").text(message).addClass("ins-error-message");
@@ -611,5 +649,6 @@ transform: translateY(-4px);
     }
   } catch (err) {
     console.log("err", err);
+    alert(error);
   }
 })();
