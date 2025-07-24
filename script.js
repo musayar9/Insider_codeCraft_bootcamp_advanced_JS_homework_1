@@ -653,6 +653,6 @@ transform: translateY(-4px);
     }
   } catch (err) {
     console.log("err", err);
-    alert(error);
+    alert(err);
   }
 })();
