@@ -141,6 +141,8 @@ h1 {
 ul {
   list-style: none;
 }
+
+/*users list style*/
 .ins-api-users {
   display: flex;
   align-items: center;
@@ -156,7 +158,7 @@ ul {
   gap: 1rem;
 }
 
-
+/*user-card styles*/
 .ins-user-card {
   background-color: white;
   border-radius: var(--borderRadius-50);
@@ -252,7 +254,7 @@ gap: 1rem;
 }
 
 
-
+/*delete button styles*/
 .ins-delete-user {
   position: absolute;
   top: 1rem;
@@ -281,9 +283,9 @@ gap: 1rem;
   color: var(--red-100);
   transition: var(--transition);
 }
-
+/*toastify message styles*/
 .message {
-  position: absolute;
+  position: fixed;
   top: 5rem;
   right: 2rem;
   padding: 0.625rem 2rem;
@@ -303,6 +305,8 @@ gap: 1rem;
 .fa-check{
     padding-right: 0.4rem;
 }
+
+/*error content styles*/
 .ins-error-content {
   margin: 4rem auto;
   display: flex;
@@ -361,8 +365,6 @@ gap: 1rem;
 
 .fa-arrow-rotate-left{
   padding-right: 0.5rem;
-
-  
 }
 
 
@@ -405,6 +407,8 @@ transform: translateY(-4px);
   padding: 1rem 0;
 }
 
+/*responsive design*/
+
 @media screen and (min-width: 992px) {
   .container h1 {
     font-size: 3rem;
@@ -429,7 +433,7 @@ transform: translateY(-4px);
     let isLoading = false;
 
     // Page Title Created
-    $("<h1>User List - Fetch API</h1>")
+    $("<h1>User List App</h1>")
       .addClass("ins-page-title")
       .insertBefore($insApiUsers);
 
@@ -479,7 +483,7 @@ transform: translateY(-4px);
         loading();
       }
     }
-
+// Loading Animation
     function loading() {
       if (isLoading) {
         let loadingSpin = ` <div class="loading-spinner" id="loading">
@@ -576,7 +580,7 @@ transform: translateY(-4px);
         });
 
       successMessageToastify(
-        `${findUser?.name} was removed from the user list.`
+        `${findUser?.name || "User"} was removed from the user list.`
       );
       deletedAllUser(updateUser);
     });
@@ -587,7 +591,7 @@ transform: translateY(-4px);
         const div = $("<div></div>").addClass("ins-not-user");
         const i = $("<i></i>").addClass("fa-solid fa-circle-exclamation");
         const p = $("<p></p>")
-          .text("All users were removed from the list")
+          .text("All users were removed from the list.")
           .addClass("ins-not-user-message");
         const button = $("<button></button>")
           .addClass("ins-not-user-button")
